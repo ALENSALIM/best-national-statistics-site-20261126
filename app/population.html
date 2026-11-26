@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Population — NusaStats: Indonesia in Numbers</title>
+<meta name="description" content="Indonesia's population: trend, age structure and provinces.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-name">Nusa<span class="accent">Stats</span></span>
+      <span class="brand-tag">Indonesia in Numbers</span>
+    </div>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="index.html">Overview</a>
+      <a href="economy.html">Economy</a>
+      <a href="population.html" aria-current="page">Population</a>
+      <a href="health.html">Health</a>
+      <a href="education.html">Education</a>
+      <a href="sources.html">Sources &amp; Methods</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <h1>Population</h1>
+  <p class="lede">About 283.5 million people lived in Indonesia in 2024 (World Bank) — the fourth
+  largest population in the world. Most live on Java: West, East and Central Java alone
+  hold more than 128 million people.</p>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Population</div><div class="kpi-value">283.5 million</div><div class="kpi-source">World Bank, 2024</div></div>
+    <div class="kpi"><div class="kpi-label">Growth since 2015</div><div class="kpi-value">+25 million</div><div class="kpi-source">World Bank, 2015–2024</div></div>
+    <div class="kpi"><div class="kpi-label">Aged 15–64</div><div class="kpi-value">68%</div><div class="kpi-source">BPS, 2024 (approx)</div></div>
+    <div class="kpi"><div class="kpi-label">Largest province</div><div class="kpi-value">West Java</div><div class="kpi-source">48.8 million, BPS 2024</div></div>
+  </div>
+
+  <section class="card" aria-labelledby="trend-heading">
+    <h2 id="trend-heading">Population trend, 2015–2024</h2>
+    <div class="chart" id="pop-chart"></div>
+    <p class="chart-note">Source: World Bank World Development Indicators, 2015–2024. Millions, rounded.</p>
+  </section>
+
+  <section class="card" aria-labelledby="age-heading">
+    <h2 id="age-heading">Age structure, 2024</h2>
+    <p>Indonesia has a young population: about a quarter of Indonesians are children under
+    15, and more than two in three are of working age. Only about 7% are 65 or older.</p>
+    <div class="chart" id="age-chart"></div>
+    <p class="chart-note">Source: Statistics Indonesia (BPS), 2024. Shares are approximate and rounded.</p>
+  </section>
+
+  <section class="card" aria-labelledby="provinces-heading">
+    <h2 id="provinces-heading">Provinces by population, 2024</h2>
+    <p>Mid-year population by province, in millions, with each province's share of the
+    national total. Type to search the table.</p>
+    <div class="controls">
+      <label for="province-search">Search provinces:</label>
+      <input type="search" id="province-search" placeholder="e.g. Java, Bali, Aceh" autocomplete="off">
+      <span class="result-count" id="result-count" aria-live="polite"></span>
+    </div>
+    <table>
+      <thead><tr><th>Province</th><th class="num">Population (millions)</th><th class="num">Share of Indonesia</th><th>Share bar</th></tr></thead>
+      <tbody id="province-body"></tbody>
+    </table>
+    <p class="chart-note">Source: Statistics Indonesia (BPS), 2024 mid-year estimates. Figures rounded to one decimal.</p>
+  </section>
+</main>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <a href="index.html">Overview</a>
+      <a href="economy.html">Economy</a>
+      <a href="population.html">Population</a>
+      <a href="health.html">Health</a>
+      <a href="education.html">Education</a>
+      <a href="sources.html">Sources &amp; Methods</a>
+    </nav>
+    <p>NusaStats is an independent statistics site. Figures are rounded published figures
+    from the World Bank and Statistics Indonesia (BPS). See Sources &amp; Methods for details.</p>
+  </div>
+</footer>
+<script src="data.js"></script>
+<script src="charts.js"></script>
+<script>
+(function () {
+  NusaCharts.seriesChart(document.getElementById('pop-chart'), NUSA.population,
+    NUSA.years.map(String), { type: 'bar', title: 'Population by year, millions' });
+  NusaCharts.horizontalBars(document.getElementById('age-chart'), NUSA.ageStructure2024,
+    { title: 'Age structure 2024, percent of population' });
+
+  var total = 283.5;
+  var body = document.getElementById('province-body');
+  var search = document.getElementById('province-search');
+  var count = document.getElementById('result-count');
+
+  function renderRows(query) {
+    var q = (query || '').trim().toLowerCase();
+    var shown = 0;
+    body.innerHTML = '';
+    NUSA.provinces2024.forEach(function (p) {
+      if (q && p.name.toLowerCase().indexOf(q) === -1) return;
+      shown++;
+      var tr = document.createElement('tr');
+      var share = Math.round((p.population / total) * 1000) / 10;
+      var tdName = document.createElement('td'); tdName.textContent = p.name;
+      var tdPop = document.createElement('td'); tdPop.className = 'num'; tdPop.textContent = p.population.toFixed(1);
+      var tdShare = document.createElement('td'); tdShare.className = 'num'; tdShare.textContent = share + '%';
+      var tdBar = document.createElement('td');
+      var track = document.createElement('div'); track.className = 'bar-track';
+      var fill = document.createElement('div'); fill.className = 'bar-fill';
+      fill.style.width = Math.max(share / 17.2 * 100, 2) + '%';
+      track.appendChild(fill); tdBar.appendChild(track);
+      tr.appendChild(tdName); tr.appendChild(tdPop); tr.appendChild(tdShare); tr.appendChild(tdBar);
+      body.appendChild(tr);
+    });
+    if (shown === 0) {
+      var tr = document.createElement('tr');
+      var td = document.createElement('td');
+      td.colSpan = 4; td.className = 'no-match';
+      td.textContent = 'No provinces match your search.';
+      tr.appendChild(td); body.appendChild(tr);
+    }
+    count.textContent = shown + ' of ' + NUSA.provinces2024.length + ' provinces shown';
+  }
+
+  search.addEventListener('input', function () { renderRows(search.value); });
+  renderRows('');
+})();
+</script>
+</body>
+</html>
