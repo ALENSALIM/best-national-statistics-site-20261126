@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Economy — NusaStats: Indonesia in Numbers</title>
+<meta name="description" content="Indonesia's economy: GDP, growth, inflation, trade and sector shares.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-name">Nusa<span class="accent">Stats</span></span>
+      <span class="brand-tag">Indonesia in Numbers</span>
+    </div>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="index.html">Overview</a>
+      <a href="economy.html" aria-current="page">Economy</a>
+      <a href="population.html">Population</a>
+      <a href="health.html">Health</a>
+      <a href="education.html">Education</a>
+      <a href="sources.html">Sources &amp; Methods</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <h1>The Economy</h1>
+  <p class="lede">Indonesia is the largest economy in Southeast Asia. Its nominal GDP was about
+  US$1.40 trillion in 2024 (World Bank), or about US$4,925 per person, and it has grown
+  by about 5% a year for most of the past decade.</p>
+
+  <div class="controls">
+    <label for="year-select">Show figures for year:</label>
+    <select id="year-select"></select>
+  </div>
+
+  <div class="kpi-grid" id="kpi-grid" aria-live="polite"></div>
+
+  <section class="card" aria-labelledby="growth-heading">
+    <h2 id="growth-heading">GDP growth, 2015–2024</h2>
+    <p>Real GDP growth, percent per year. The 2020 dip to −2.07% was the pandemic recession;
+    growth bounced back to 5.31% in 2022 and has held near 5% since.</p>
+    <div class="controls">
+      <span>Chart type:</span>
+      <button type="button" class="btn" id="growth-bar" aria-pressed="true">Bars</button>
+      <button type="button" class="btn" id="growth-line" aria-pressed="false">Line</button>
+    </div>
+    <div class="chart" id="growth-chart"></div>
+    <p class="chart-note">Source: Statistics Indonesia (BPS), 2015–2024.</p>
+  </section>
+
+  <section class="card" aria-labelledby="inflation-heading">
+    <h2 id="inflation-heading">Inflation, 2015–2024</h2>
+    <p>Consumer price inflation, annual average, percent. Inflation stayed inside Bank
+    Indonesia's target band in most years; the 2022 spike to 5.51% followed the rise in
+    subsidised fuel prices, and by 2024 it had eased to 1.57%.</p>
+    <div class="controls">
+      <span>Chart type:</span>
+      <button type="button" class="btn" id="inf-bar" aria-pressed="true">Bars</button>
+      <button type="button" class="btn" id="inf-line" aria-pressed="false">Line</button>
+    </div>
+    <div class="chart" id="inflation-chart"></div>
+    <p class="chart-note">Source: Statistics Indonesia (BPS), 2015–2024.</p>
+  </section>
+
+  <div class="two-col">
+    <section class="card" aria-labelledby="sectors-heading">
+      <h2 id="sectors-heading">What makes up GDP, 2024</h2>
+      <p>Shares of GDP by sector, percent. Manufacturing is the largest single sector at
+      about 19%, followed by trade at 13% and agriculture at 12%.</p>
+      <div class="chart" id="sectors-chart"></div>
+      <p class="chart-note">Source: Statistics Indonesia (BPS), 2024. Shares are approximate and rounded.</p>
+    </section>
+    <section class="card" aria-labelledby="trade-heading">
+      <h2 id="trade-heading">Trade, 2024</h2>
+      <p>Indonesia sold more to the world than it bought in 2024.</p>
+      <table>
+        <thead><tr><th>Flow</th><th class="num">US$ billion</th></tr></thead>
+        <tbody>
+          <tr><td>Exports</td><td class="num">265</td></tr>
+          <tr><td>Imports</td><td class="num">234</td></tr>
+          <tr><td><strong>Trade surplus</strong></td><td class="num"><strong>31</strong></td></tr>
+        </tbody>
+      </table>
+      <p class="chart-note">Source: Statistics Indonesia (BPS), 2024. Figures rounded to the nearest billion.</p>
+      <h3>Labour market</h3>
+      <p>Unemployment was 4.86% in August 2024 (BPS) — the lowest in years — and the poverty
+      rate was 8.57% in September 2024 (BPS), down from double digits a decade earlier.</p>
+    </section>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <a href="index.html">Overview</a>
+      <a href="economy.html">Economy</a>
+      <a href="population.html">Population</a>
+      <a href="health.html">Health</a>
+      <a href="education.html">Education</a>
+      <a href="sources.html">Sources &amp; Methods</a>
+    </nav>
+    <p>NusaStats is an independent statistics site. Figures are rounded published figures
+    from the World Bank and Statistics Indonesia (BPS). See Sources &amp; Methods for details.</p>
+  </div>
+</footer>
+<script src="data.js"></script>
+<script src="charts.js"></script>
+<script>
+(function () {
+  var years = NUSA.years;
+  var select = document.getElementById('year-select');
+  years.forEach(function (y) {
+    var opt = document.createElement('option');
+    opt.value = y; opt.textContent = y;
+    select.appendChild(opt);
+  });
+  select.value = '2024';
+  var selectedYear = 2024;
+  var growthType = 'bar';
+  var infType = 'bar';
+
+  function kpiCard(label, value, source) {
+    var div = document.createElement('div');
+    div.className = 'kpi';
+    var l = document.createElement('div'); l.className = 'kpi-label'; l.textContent = label;
+    var v = document.createElement('div'); v.className = 'kpi-value'; v.textContent = value;
+    var s = document.createElement('div'); s.className = 'kpi-source'; s.textContent = source;
+    div.appendChild(l); div.appendChild(v); div.appendChild(s);
+    return div;
+  }
+
+  function renderKpis() {
+    var i = years.indexOf(selectedYear);
+    var grid = document.getElementById('kpi-grid');
+    grid.innerHTML = '';
+    grid.appendChild(kpiCard('GDP growth', NUSA.gdpGrowth[i] + '%', 'BPS, ' + selectedYear));
+    grid.appendChild(kpiCard('Inflation (CPI avg)', NUSA.inflation[i] + '%', 'BPS, ' + selectedYear));
+    grid.appendChild(kpiCard('Population', NUSA.population[i] + ' million', 'World Bank, ' + selectedYear));
+    grid.appendChild(kpiCard('GDP (nominal)', 'US$1.40 trillion', 'World Bank, 2024 (latest)'));
+  }
+
+  function renderCharts() {
+    var hi = years.indexOf(selectedYear);
+    NusaCharts.seriesChart(document.getElementById('growth-chart'), NUSA.gdpGrowth,
+      years.map(String), { type: growthType, highlight: hi, title: 'GDP growth by year, percent' });
+    NusaCharts.seriesChart(document.getElementById('inflation-chart'), NUSA.inflation,
+      years.map(String), { type: infType, highlight: hi, title: 'Inflation by year, percent' });
+  }
+
+  function renderAll() { renderKpis(); renderCharts(); }
+
+  select.addEventListener('change', function () { selectedYear = Number(select.value); renderAll(); });
+  function wireToggle(barId, lineId, setType) {
+    document.getElementById(barId).addEventListener('click', function () {
+      setType('bar');
+      document.getElementById(barId).setAttribute('aria-pressed', 'true');
+      document.getElementById(lineId).setAttribute('aria-pressed', 'false');
+      renderCharts();
+    });
+    document.getElementById(lineId).addEventListener('click', function () {
+      setType('line');
+      document.getElementById(lineId).setAttribute('aria-pressed', 'true');
+      document.getElementById(barId).setAttribute('aria-pressed', 'false');
+      renderCharts();
+    });
+  }
+  wireToggle('growth-bar', 'growth-line', function (t) { growthType = t; });
+  wireToggle('inf-bar', 'inf-line', function (t) { infType = t; });
+
+  NusaCharts.donutChart(document.getElementById('sectors-chart'), NUSA.sectors2024,
+    { title: 'Sector shares of GDP 2024, percent', centerLabel: 'GDP 2024', centerSub: 'by sector' });
+  renderAll();
+})();
+</script>
+</body>
+</html>
