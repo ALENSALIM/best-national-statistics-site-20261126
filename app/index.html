@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NusaStats — Indonesia in Numbers</title>
+<meta name="description" content="NusaStats: Indonesia in numbers — population, economy, health and education, from rounded published figures.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-name">Nusa<span class="accent">Stats</span></span>
+      <span class="brand-tag">Indonesia in Numbers</span>
+    </div>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="index.html" aria-current="page">Overview</a>
+      <a href="economy.html">Economy</a>
+      <a href="population.html">Population</a>
+      <a href="health.html">Health</a>
+      <a href="education.html">Education</a>
+      <a href="sources.html">Sources &amp; Methods</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <h1>Indonesia in Numbers</h1>
+  <p class="lede">The headline figures for the world's fourth most populous country — its people,
+  its economy, its health and its schools — in one place. Every figure is a rounded
+  published figure, shown with its year and source.</p>
+
+  <div class="controls">
+    <label for="year-select">Show figures for year:</label>
+    <select id="year-select"></select>
+    <span class="source-note" id="year-note">Year selector updates the cards below and highlights the year on the charts.</span>
+  </div>
+
+  <div class="kpi-grid" id="kpi-grid" aria-live="polite"></div>
+
+  <section class="card" aria-labelledby="gdp-heading">
+    <h2 id="gdp-heading">GDP growth, 2015–2024</h2>
+    <p>Annual growth of real gross domestic product, percent per year. Indonesia grew every
+    year in this decade except 2020, when the pandemic shrank the economy by 2.07%.</p>
+    <div class="controls">
+      <span id="gdp-toggle-label">Chart type:</span>
+      <button type="button" class="btn" id="gdp-bar" aria-pressed="true">Bars</button>
+      <button type="button" class="btn" id="gdp-line" aria-pressed="false">Line</button>
+    </div>
+    <div class="chart" id="gdp-chart"></div>
+    <p class="chart-note">Source: Statistics Indonesia (BPS), 2015–2024. Figures rounded.</p>
+  </section>
+
+  <section class="card" aria-labelledby="pop-heading">
+    <h2 id="pop-heading">Population, 2015–2024</h2>
+    <p>Indonesia's population rose from about 258 million in 2015 to about 283 million in
+    2024 — roughly 25 million more people in a decade.</p>
+    <div class="chart" id="pop-chart"></div>
+    <p class="chart-note">Source: World Bank World Development Indicators, 2015–2024. Figures rounded to the nearest million.</p>
+  </section>
+
+  <section aria-labelledby="explore-heading">
+    <h2 id="explore-heading">Explore the numbers</h2>
+    <div class="section-links">
+      <a class="section-link" href="economy.html"><strong>Economy</strong>GDP, growth, inflation, trade and the sectors that make up the economy.</a>
+      <a class="section-link" href="population.html"><strong>Population</strong>How many Indonesians there are, how old they are, and where they live.</a>
+      <a class="section-link" href="health.html"><strong>Health</strong>How long Indonesians live and how healthy their children are.</a>
+      <a class="section-link" href="education.html"><strong>Education</strong>Schooling, literacy and enrolment from primary school to university.</a>
+      <a class="section-link" href="sources.html"><strong>Sources &amp; Methods</strong>Where every figure comes from, and how the figures were rounded.</a>
+    </div>
+  </section>
+</main>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <a href="index.html">Overview</a>
+      <a href="economy.html">Economy</a>
+      <a href="population.html">Population</a>
+      <a href="health.html">Health</a>
+      <a href="education.html">Education</a>
+      <a href="sources.html">Sources &amp; Methods</a>
+    </nav>
+    <p>NusaStats is an independent statistics site. Figures are rounded published figures
+    from the World Bank and Statistics Indonesia (BPS). See Sources &amp; Methods for details.</p>
+  </div>
+</footer>
+<script src="data.js"></script>
+<script src="charts.js"></script>
+<script>
+(function () {
+  var years = NUSA.years;
+  var select = document.getElementById('year-select');
+  years.forEach(function (y) {
+    var opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    select.appendChild(opt);
+  });
+  select.value = '2024';
+
+  var gdpType = 'bar';
+  var selectedYear = 2024;
+
+  function kpiCard(label, value, source) {
+    var div = document.createElement('div');
+    div.className = 'kpi';
+    var l = document.createElement('div'); l.className = 'kpi-label'; l.textContent = label;
+    var v = document.createElement('div'); v.className = 'kpi-value'; v.textContent = value;
+    var s = document.createElement('div'); s.className = 'kpi-source'; s.textContent = source;
+    div.appendChild(l); div.appendChild(v); div.appendChild(s);
+    return div;
+  }
+
+  function renderKpis() {
+    // Four headline cards in a single row, so the GDP chart is visible in the
+    // first viewport too. The other headline figures live on their own pages.
+    var i = years.indexOf(selectedYear);
+    var grid = document.getElementById('kpi-grid');
+    grid.innerHTML = '';
+    grid.appendChild(kpiCard('Population', NUSA.population[i] + ' million', 'World Bank, ' + selectedYear));
+    grid.appendChild(kpiCard('GDP growth', NUSA.gdpGrowth[i] + '%', 'BPS, ' + selectedYear));
+    grid.appendChild(kpiCard('Inflation (CPI avg)', NUSA.inflation[i] + '%', 'BPS, ' + selectedYear));
+    if (selectedYear === 2024) {
+      grid.appendChild(kpiCard('GDP (nominal)', 'US$1.40 trillion', 'World Bank, 2024'));
+    } else {
+      grid.appendChild(kpiCard('GDP (nominal)', 'US$1.40 trillion', 'World Bank, 2024 (latest)'));
+    }
+  }
+
+  function renderCharts() {
+    var hi = years.indexOf(selectedYear);
+    NusaCharts.seriesChart(document.getElementById('gdp-chart'), NUSA.gdpGrowth,
+      years.map(String), { type: gdpType, highlight: hi, title: 'GDP growth by year, percent' });
+    NusaCharts.seriesChart(document.getElementById('pop-chart'), NUSA.population,
+      years.map(String), { type: 'bar', highlight: hi, title: 'Population by year, millions' });
+  }
+
+  function renderAll() { renderKpis(); renderCharts(); }
+
+  select.addEventListener('change', function () {
+    selectedYear = Number(select.value);
+    renderAll();
+  });
+  document.getElementById('gdp-bar').addEventListener('click', function () {
+    gdpType = 'bar';
+    document.getElementById('gdp-bar').setAttribute('aria-pressed', 'true');
+    document.getElementById('gdp-line').setAttribute('aria-pressed', 'false');
+    renderCharts();
+  });
+  document.getElementById('gdp-line').addEventListener('click', function () {
+    gdpType = 'line';
+    document.getElementById('gdp-line').setAttribute('aria-pressed', 'true');
+    document.getElementById('gdp-bar').setAttribute('aria-pressed', 'false');
+    renderCharts();
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
