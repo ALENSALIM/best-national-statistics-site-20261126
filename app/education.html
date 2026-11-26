@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Education — NusaStats: Indonesia in Numbers</title>
+<meta name="description" content="Indonesia's education: schooling, literacy and enrolment.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-name">Nusa<span class="accent">Stats</span></span>
+      <span class="brand-tag">Indonesia in Numbers</span>
+    </div>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="index.html">Overview</a>
+      <a href="economy.html">Economy</a>
+      <a href="population.html">Population</a>
+      <a href="health.html">Health</a>
+      <a href="education.html" aria-current="page">Education</a>
+      <a href="sources.html">Sources &amp; Methods</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <h1>Education</h1>
+  <p class="lede">Almost every Indonesian child now goes to primary school, and adults are more
+  literate than ever — about 96% of adults can read and write. The next challenge is
+  keeping teenagers in school and getting more young people into higher education.</p>
+
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <section class="card" aria-labelledby="enrol-heading">
+    <h2 id="enrol-heading">Enrolment by level, 2024</h2>
+    <p>Share of the relevant age group enrolled, percent. Primary enrolment is near
+    universal; the share falls at each higher level.</p>
+    <div class="chart" id="enrol-chart"></div>
+    <p class="chart-note">Source: Statistics Indonesia (BPS) and World Bank, 2024. Figures rounded.</p>
+  </section>
+
+  <section class="card" aria-labelledby="schooling-heading">
+    <h2 id="schooling-heading">Years of schooling</h2>
+    <p>The average Indonesian adult has completed about 9.1 years of schooling (BPS, 2024) —
+    roughly the end of junior secondary school. A child starting school today can expect
+    about 13.3 years of schooling (BPS, 2024), which would take them through senior
+    secondary school and into the first years of higher education.</p>
+    <table>
+      <thead><tr><th>Indicator</th><th class="num">Value</th><th>Year</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>Mean years of schooling</td><td class="num">9.1 years</td><td>2024</td><td>BPS</td></tr>
+        <tr><td>Expected years of schooling</td><td class="num">13.3 years</td><td>2024</td><td>BPS</td></tr>
+        <tr><td>Adult literacy rate</td><td class="num">96%</td><td>2024</td><td>BPS</td></tr>
+        <tr><td>Primary net enrolment</td><td class="num">99%</td><td>2024</td><td>BPS</td></tr>
+        <tr><td>Secondary net enrolment</td><td class="num">82%</td><td>2024</td><td>BPS</td></tr>
+        <tr><td>Tertiary gross enrolment</td><td class="num">36%</td><td>2024</td><td>World Bank</td></tr>
+      </tbody>
+    </table>
+    <p class="chart-note">Figures are rounded published figures; see Sources &amp; Methods.</p>
+  </section>
+</main>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <a href="index.html">Overview</a>
+      <a href="economy.html">Economy</a>
+      <a href="population.html">Population</a>
+      <a href="health.html">Health</a>
+      <a href="education.html">Education</a>
+      <a href="sources.html">Sources &amp; Methods</a>
+    </nav>
+    <p>NusaStats is an independent statistics site. Figures are rounded published figures
+    from the World Bank and Statistics Indonesia (BPS). See Sources &amp; Methods for details.</p>
+  </div>
+</footer>
+<script src="data.js"></script>
+<script src="charts.js"></script>
+<script>
+(function () {
+  var ed = NUSA.education;
+  var grid = document.getElementById('kpi-grid');
+  function kpiCard(label, value, source) {
+    var div = document.createElement('div');
+    div.className = 'kpi';
+    var l = document.createElement('div'); l.className = 'kpi-label'; l.textContent = label;
+    var v = document.createElement('div'); v.className = 'kpi-value'; v.textContent = value;
+    var s = document.createElement('div'); s.className = 'kpi-source'; s.textContent = source;
+    div.appendChild(l); div.appendChild(v); div.appendChild(s);
+    return div;
+  }
+  grid.appendChild(kpiCard('Mean years of schooling', ed.meanSchooling2024.value + ' years', 'BPS, 2024'));
+  grid.appendChild(kpiCard('Expected years of schooling', ed.expectedSchooling2024.value + ' years', 'BPS, 2024'));
+  grid.appendChild(kpiCard('Adult literacy', ed.adultLiteracy.value + '%', 'BPS, 2024'));
+  grid.appendChild(kpiCard('Primary enrolment', ed.primaryNetEnrolment.value + '%', 'BPS, 2024'));
+
+  NusaCharts.horizontalBars(document.getElementById('enrol-chart'), [
+    { group: 'Primary', share: ed.primaryNetEnrolment.value },
+    { group: 'Secondary', share: ed.secondaryNetEnrolment.value },
+    { group: 'Tertiary', share: ed.tertiaryGrossEnrolment.value },
+  ], { title: 'Enrolment by level 2024, percent' });
+})();
+</script>
+</body>
+</html>
