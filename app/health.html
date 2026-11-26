@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Health — NusaStats: Indonesia in Numbers</title>
+<meta name="description" content="Indonesia's health: life expectancy, infant mortality and health indicators.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <span class="brand-name">Nusa<span class="accent">Stats</span></span>
+      <span class="brand-tag">Indonesia in Numbers</span>
+    </div>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="index.html">Overview</a>
+      <a href="economy.html">Economy</a>
+      <a href="population.html">Population</a>
+      <a href="health.html" aria-current="page">Health</a>
+      <a href="education.html">Education</a>
+      <a href="sources.html">Sources &amp; Methods</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <h1>Health</h1>
+  <p class="lede">Indonesians live longer and their children survive at higher rates than a decade
+  ago — but the gains have been slow, and the pandemic set life expectancy back in 2021.</p>
+
+  <div class="kpi-grid" id="kpi-grid" aria-live="polite"></div>
+
+  <section class="card" aria-labelledby="metric-heading">
+    <h2 id="metric-heading">Health trends</h2>
+    <p>Switch between the two headline health measures. Life expectancy is in years;
+    infant mortality is deaths per 1,000 live births.</p>
+    <div class="controls">
+      <span>Measure:</span>
+      <button type="button" class="btn" id="metric-life" aria-pressed="true">Life expectancy</button>
+      <button type="button" class="btn" id="metric-infant" aria-pressed="false">Infant mortality</button>
+    </div>
+    <div class="chart" id="health-chart"></div>
+    <p class="chart-note" id="health-note">Source: World Bank World Development Indicators. Figures rounded.</p>
+  </section>
+
+  <section class="card" aria-labelledby="indicators-heading">
+    <h2 id="indicators-heading">More health indicators</h2>
+    <table>
+      <thead><tr><th>Indicator</th><th class="num">Value</th><th>Year</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>Life expectancy at birth</td><td class="num">71.8 years</td><td>2023</td><td>World Bank</td></tr>
+        <tr><td>Infant mortality rate</td><td class="num">17 per 1,000 live births</td><td>2023</td><td>World Bank</td></tr>
+        <tr><td>Under-five mortality rate</td><td class="num">21 per 1,000 live births</td><td>2023</td><td>World Bank</td></tr>
+        <tr><td>Maternal mortality ratio</td><td class="num">173 per 100,000 live births</td><td>2020</td><td>World Bank</td></tr>
+        <tr><td>Hospital beds</td><td class="num">10 per 10,000 people</td><td>2023</td><td>World Bank</td></tr>
+        <tr><td>Physicians</td><td class="num">5 per 10,000 people</td><td>2023</td><td>World Bank</td></tr>
+      </tbody>
+    </table>
+    <p class="chart-note">Figures are rounded published figures; see Sources &amp; Methods.</p>
+  </section>
+</main>
+<footer class="site-footer">
+  <div class="footer-inner">
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <a href="index.html">Overview</a>
+      <a href="economy.html">Economy</a>
+      <a href="population.html">Population</a>
+      <a href="health.html">Health</a>
+      <a href="education.html">Education</a>
+      <a href="sources.html">Sources &amp; Methods</a>
+    </nav>
+    <p>NusaStats is an independent statistics site. Figures are rounded published figures
+    from the World Bank and Statistics Indonesia (BPS). See Sources &amp; Methods for details.</p>
+  </div>
+</footer>
+<script src="data.js"></script>
+<script src="charts.js"></script>
+<script>
+(function () {
+  var metric = 'life';
+  var grid = document.getElementById('kpi-grid');
+
+  function kpiCard(label, value, source) {
+    var div = document.createElement('div');
+    div.className = 'kpi';
+    var l = document.createElement('div'); l.className = 'kpi-label'; l.textContent = label;
+    var v = document.createElement('div'); v.className = 'kpi-value'; v.textContent = value;
+    var s = document.createElement('div'); s.className = 'kpi-source'; s.textContent = source;
+    div.appendChild(l); div.appendChild(v); div.appendChild(s);
+    return div;
+  }
+
+  function renderKpis() {
+    grid.innerHTML = '';
+    if (metric === 'life') {
+      grid.appendChild(kpiCard('Life expectancy', '71.8 years', 'World Bank, 2023'));
+      grid.appendChild(kpiCard('Life expectancy, 2015', '71.1 years', 'World Bank, 2015'));
+      grid.appendChild(kpiCard('Change 2015–2023', '+0.7 years', 'World Bank'));
+      grid.appendChild(kpiCard('Pandemic dip, 2021', '71.4 years', 'World Bank, 2021'));
+    } else {
+      grid.appendChild(kpiCard('Infant mortality', '17 per 1,000', 'World Bank, 2023'));
+      grid.appendChild(kpiCard('Infant mortality, 2015', '21 per 1,000', 'World Bank, 2015'));
+      grid.appendChild(kpiCard('Change 2015–2023', '−4 per 1,000', 'World Bank'));
+      grid.appendChild(kpiCard('Under-five mortality', '21 per 1,000', 'World Bank, 2023'));
+    }
+  }
+
+  function renderChart() {
+    var el = document.getElementById('health-chart');
+    if (metric === 'life') {
+      NusaCharts.seriesChart(el,
+        NUSA.lifeExpectancy.map(function (d) { return d.value; }),
+        NUSA.lifeExpectancy.map(function (d) { return String(d.year); }),
+        { type: 'line', title: 'Life expectancy at birth, years' });
+    } else {
+      NusaCharts.seriesChart(el,
+        NUSA.infantMortality.map(function (d) { return d.value; }),
+        NUSA.infantMortality.map(function (d) { return String(d.year); }),
+        { type: 'bar', title: 'Infant mortality, deaths per 1,000 live births' });
+    }
+  }
+
+  function renderAll() { renderKpis(); renderChart(); }
+
+  document.getElementById('metric-life').addEventListener('click', function () {
+    metric = 'life';
+    document.getElementById('metric-life').setAttribute('aria-pressed', 'true');
+    document.getElementById('metric-infant').setAttribute('aria-pressed', 'false');
+    renderAll();
+  });
+  document.getElementById('metric-infant').addEventListener('click', function () {
+    metric = 'infant';
+    document.getElementById('metric-infant').setAttribute('aria-pressed', 'true');
+    document.getElementById('metric-life').setAttribute('aria-pressed', 'false');
+    renderAll();
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
